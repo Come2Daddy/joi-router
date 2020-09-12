@@ -14,6 +14,7 @@ function OutputValidationRule(status, spec) {
   assert(this.ranges.length > 0, 'invalid status code: ' + status + helpMsg);
 
   this.status = status;
+  this.options = spec.options || {};
   this.spec = spec;
   this.validateSpec();
 }
@@ -69,16 +70,18 @@ OutputValidationRule.prototype.matches = function matches(ctx) {
 OutputValidationRule.prototype.validateOutput = function validateOutput(ctx) {
   let result;
 
+  console.log
+
   if (this.spec.headers) {
     const schema = Joi.compile(this.spec.headers);
-    result = schema.validate(ctx.response.headers, (validate.validateOptions || {}));
+    result = schema.validate(ctx.response.headers, (this.options || {}));
     if (result.error) return result.error;
     // use casted values
     ctx.set(result.value);
   }
 
   if (this.spec.body) {
-    const schema = Joi.compile(this.spec.body, (validate.validateOptions || {}));
+    const schema = Joi.compile(this.spec.body, (this.options || {}));
     result = schema.validate(ctx.body);
     if (result.error) return result.error;
     // use casted values
