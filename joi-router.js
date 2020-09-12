@@ -8,7 +8,7 @@ const methods = require('methods');
 const KoaRouter = require('@koa/router');
 const busboy = require('await-busboy');
 const parse = require('co-body');
-const Joi = require('@hapi/joi');
+const Joi = require('joi');
 const slice = require('sliced');
 const delegate = require('delegates');
 const clone = require('clone');
@@ -478,7 +478,8 @@ function validateInput(prop, ctx, validate) {
   debug('validating %s', prop);
 
   const request = ctx.request;
-  const res = Joi.validate(request[prop], validate[prop]);
+  const schema = Joi.compile(validate[prop]);
+  const res = schema.validate(request[prop], (validate.validateOptions || {}));
 
   if (res.error) {
     res.error.status = validate.failure;
